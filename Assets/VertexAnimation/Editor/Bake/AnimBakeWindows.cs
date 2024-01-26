@@ -127,40 +127,23 @@ public class AnimBakeWindows : EditorWindow
         EditorGUILayout.LabelField("保存根路径：");
         savePath = EditorGUILayout.TextField(savePath);
         PlayerPrefs.SetString("savePath", savePath);
-        EditorGUILayout.LabelField("跳转烘培scene后，点击play开始烘培");
-        if (GUILayout.Button("跳转烘培scene"))
+        //EditorGUILayout.LabelField("跳转烘培scene后，点击play开始烘培");
+        
+        if (GUILayout.Button("开始烘培"))
         {
-            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-            {
-                string[] sceneGUIDs = AssetDatabase.FindAssets("t:Scene", new[] { "Assets" });
-
-                foreach (string guid in sceneGUIDs)
-                {
-                    string scenePath = AssetDatabase.GUIDToAssetPath(guid);
-                    if (scenePath.EndsWith("BakerScene.unity"))
-                    {
-                        // 找到匹配的场景，打开它
-                        EditorSceneManager.OpenScene(scenePath);
-                        break;
-                    }
-                }
-            }
-
-            GameObject root = GameObject.Find("PrefabRoot");
-            if (root != null)
-            {
-                GameObject.DestroyImmediate(root);
-            }
-            root = new GameObject("PrefabRoot");
-
             foreach (var gb in prefabList)
             {
                 GameObject instance = GameObject.Instantiate(gb);
-                BakerMono bakerMono = instance.AddComponent<BakerMono>();
-                bakerMono.computeShader = computeShader;
-                bakerMono.animMapShader = animMapShader;
-                bakerMono.basePath = savePath;
-                instance.transform.SetParent(root.transform);
+                Bake bake = new Bake(savePath, animMapShader, computeShader);
+                this.StartCoroutine(bake.BakeVertexTexture(instance));
+                //EditorApplication.update += () => {
+                //    animator.Update(Time.deltaTime); // 手动更新Animator
+                //    i++;
+                //    skin.BakeMesh(mesh);
+                //    Debug.Log(mesh.ToString());
+                //    animator.Play("Ani3D_Whitetipshark_Normal_SwimTurn_A_01", 0, (float)((i % 36) + 1) / 36);
+                //};
+                break;
             }
         }
     }

@@ -97,6 +97,7 @@ public class Bake
                 for (var i = 0; i < frameCount; ++i)
                 {
                     animator.Play(state.state.name, 0, (float)i / frameCount);
+                    animator.Update(Time.deltaTime);
                     yield return 0;
                     skin.BakeMesh(mesh);
                     vertexs.AddRange(Enumerable.Range(0, vertCount).Select(idx => new VertexInfo
@@ -132,6 +133,7 @@ public class Bake
             }
         }
         Save(bakeData);
+        GameObject.DestroyImmediate(gameObject);
         Debug.Log("烘培结束！");
         yield return null;
     }
